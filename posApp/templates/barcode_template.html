@@ -1,0 +1,20 @@
+<!-- barcode_template.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Barcode Scanner</title>
+</head>
+<body>
+    {% if barcode_data %}
+        <h1>Barcode Data: {{ barcode_data }}</h1>
+    {% else %}
+        <h1>No Barcode Detected</h1>
+    {% endif %}
+    <script>
+        // Auto-refresh the page every 5 seconds
+        setTimeout(function() {
+            location.reload();
+        }, 5000);
+    </script>
+</body>
+</html>
