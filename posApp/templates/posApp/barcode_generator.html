@@ -1,0 +1,92 @@
+{% extends "posApp/base.html" %} {% load humanize %} {% block pageContent %}
+
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+    <div class="mdc-card info-card info-card--success">
+        <h4>Barcode Generator</h4>
+        <div class="my-4">
+            <form action="" method="post">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                    <label for="name" class="control-label">Product name</label>
+                    <input type="text" name="productname" id="productname"
+                        class="form-control form-control-sm rounded-0" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="category_id" class="control-label">Category</label>
+                    <select name="category_id" id="category_id" class="form-select form-select-sm rounded-0" required>
+                        {% if not product.category_id %}
+                        <option value="" disabled selected></option>
+                        {% else %}
+                        <option value="" disabled></option>
+                        {% endif %}
+                        {% for category in categories %}
+                        {% if product.category_id == category.id %}
+                        <option value="{{ category.id }}" selected>{{ category.name }}</option>
+                        {% else %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                    <div class="form-group mb-3">
+                        <label for="price" class="control-label">Price</label>
+                        <input type="text" name="price" id="price" class="form-control form-control-sm rounded-0" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="stock" class="control-label">Stock</label>
+                        <input type="text" name="stock" id="stock" class="form-control form-control-sm rounded-0" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="status" class="control-label">Status</label>
+                        <select name="status" id="status" class="form-select form-select-sm rounded-0" required>
+                            {% if product.status and product.status == 1 %}
+                            <option value="1" selected>Active</option>
+                            {% else %}
+                            <option value="1">Active</option>
+                            {% endif %}
+                            {% if product.status and product.status == 0 %}
+                            <option value="0" selected>Inactive</option>
+                            {% else %}
+                            <option value="0">Inactive</option>
+                            {% endif %}
+                        </select>
+                    </div>
+               
+                <button type="submit" class="btn btn-primary mr-2">Generate</button>
+            </form>
+        </div>
+        <div class="table-responsive my-4">
+            <table class="table table-striped table-bordered">
+                <colgroup>
+                    <col width="20%">
+                    <col width="20%">
+                    <col width="40%">
+                    <col width="20%">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th class="text-center py-1">Product Name</th>
+                        <th class="text-center py-1">Barcode No</th>
+                        <th class="text-center py-1">Preview</th>
+                        <th class="text-center py-1">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in barcodes %}
+                    <tr>
+                        <td class="px-2 py-1 text-center">{{ i.name }}</td>
+                        <td class="px-2 py-1 text-center">{{ i.barcodeNo }}</td>
+                        <td class="px-2 py-1 text-center"><img src="{{ i.barcode.url }}" alt=""
+                                style="width: 120px; height: auto;"></td>
+                        <td class="px-2 py-1 text-center">
+                            <a href="{{i.barcode.url}}" class="btn btn-sm btn-primary" download>Download</a>
+                            <a href="{% url 'delete-barcode' i.barcodeNo %}" class="btn btn-sm btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock pageContent %}

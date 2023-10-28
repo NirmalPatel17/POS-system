@@ -1,4 +1,4 @@
-{% extends "posApp/base.html" %} {% block pageContent %}
+{% extends "posApp/base.html" %} {% load static %}{% block pageContent %}
 <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
     <div class="mdc-card py-2">
         <div class="d-flex justify-content-between align-items-center">
@@ -127,15 +127,21 @@
         <td class="px-2 py-1 product_price text-end"></td>
         <td class="px-2 py-1 product_total text-end"></td>
     </tr>
-</noscript> {% endblock pageContent %} {% block ScriptBlock %}
+</noscript> 
+<!-- <button id="rzp-button1" class="btn btn-primary">Pay with Razorpay</button> -->
+{% endblock pageContent %} {% block ScriptBlock %}
+
+<!-- <script src="https://checkout.razorpay.com/v1/checkout.js"></script> -->
 <script>
     var barcode = '';
     var interval;
     document.addEventListener('keydown', function (evt) {
         if (interval)
             clearInterval(interval);
+        let beepSound = new Audio("{% static 'posAPP/assets/default/barcode.wav' %}"); 
         if (evt.code == 'Enter') {
             if (barcode)
+                beepSound.play();
                 handleBarcode(barcode);
             document.getElementById('last-barcode').value = barcode;
             barcode = '';
@@ -310,5 +316,37 @@
             })
         })
     })
+    
+
+    // payment
+    var options = {
+        "key": "rzp_test_dhPvnOgyr7TV8o", // Enter the Key ID generated from the Dashboard
+        "amount": $('[name="grand_total"]').val(), // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+        "currency": "INR",
+        "image": "https://example.com/your_logo",
+        "order_id": "order_IluGWxBm9U8zJ8", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+        "handler": function (response) {
+            alert(response.razorpay_payment_id);
+            alert(response.razorpay_order_id);
+            alert(response.razorpay_signature)
+        },
+        "theme": {
+            "color": "#3399cc"
+        }
+    };
+    var rzp1 = new window.Razorpay(options);
+    rzp1.on('payment.failed', function (response) {
+        alert(response.error.code);
+        alert(response.error.description);
+        alert(response.error.source);
+        alert(response.error.step);
+        alert(response.error.reason);
+        alert(response.error.metadata.order_id);
+        alert(response.error.metadata.payment_id);
+    });
+    document.getElementById('rzp-button1').onclick = function (e) {
+        rzp1.open();
+        e.preventDefault();
+    }
 </script>
 {% endblock ScriptBlock %}

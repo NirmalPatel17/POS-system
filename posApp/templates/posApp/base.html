@@ -8,16 +8,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> {% if page_title %}
     <title>{{ page_title }} | Grocery POS</title>
     {% else %}
-    <title>Grocery POS</title>
+    <title>POS</title>
     {% endif %}
     <link rel="stylesheet" href="{% static 'posApp/assets/bootstrap/css/bootstrap.min.css' %}">
 
     <!-- plugins:css -->
-    <link rel="stylesheet" href="{% static 'posApp/assets/material-admin/vendors/mdi/css/materialdesignicons.min.css' %}">
+    <link rel="stylesheet"
+        href="{% static 'posApp/assets/material-admin/vendors/mdi/css/materialdesignicons.min.css' %}">
     <link rel="stylesheet" href="{% static 'posApp/assets/material-admin/vendors/css/vendor.bundle.base.css' %}">
     <!-- endinject -->
     <!-- Plugin css for this page -->
-    <link rel="stylesheet" href="{% static 'posApp/assets/material-admin/vendors/flag-icon-css/css/flag-icon.min.css' %}">
+    <link rel="stylesheet"
+        href="{% static 'posApp/assets/material-admin/vendors/flag-icon-css/css/flag-icon.min.css' %}">
     <link rel="stylesheet" href="{% static 'posApp/assets/material-admin/vendors/jvectormap/jquery-jvectormap.css' %}">
     <!-- End plugin css for this page -->
     <!-- Layout styles -->
@@ -59,7 +61,8 @@
                                     <div class="d-flex w-100">
                                         <div class="col-auto flex-shrink-1 flex-grow-1">{{ message }}</div>
                                         <div class="col-auto text-center">
-                                            <button class="btn-close btn-sm text-sm" type="button" onclick="$(this).closest('.alert').remove()"></button>
+                                            <button class="btn-close btn-sm text-sm" type="button"
+                                                onclick="$(this).closest('.alert').remove()"></button>
                                         </div>
                                     </div>
 
@@ -81,7 +84,8 @@
                     <div class="mdc-layout-grid">
                         <div class="mdc-layout-grid__inner">
                             <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-6-desktop">
-                                <span class="text-center text-sm-left d-block d-sm-inline-block tx-14">Copyright © <a href="#">Nirmal Patel</a> {% now 'Y' %}</span>
+                                <span class="text-center text-sm-left d-block d-sm-inline-block tx-14">Copyright © <a
+                                        href="#">POS</a> {% now 'Y' %}</span>
                             </div>
                             <!-- <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-6-desktop d-flex justify-content-end">
                                 <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center tx-14">Free <a href="https://www.bootstrapdash.com/material-design-dashboard/" target="_blank"> material admin </a> dashboards from Bootstrapdash.com</span>
@@ -103,8 +107,10 @@
                 <div class="modal-body">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn  btn-sm btn-flat btn-primary rounded-0" id='submit' onclick="$('#uni_modal form').submit()">Save</button>
-                    <button type="button" class="btn btn-sm btn-flat btn-secondary rounded-0" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn  btn-sm btn-flat btn-primary rounded-0" id='submit'
+                        onclick="$('#uni_modal form').submit()">Save</button>
+                    <button type="button" class="btn btn-sm btn-flat btn-secondary rounded-0"
+                        data-bs-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>
@@ -119,20 +125,37 @@
                     <div id="delete_content"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-sm btn-flat btn-primary rounded-0" id='confirm' onclick="">Continue</button>
-                    <button type="button" class="btn btn-sm btn-flat btn-secondary rounded-0" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-sm btn-flat btn-primary rounded-0" id='confirm'
+                        onclick="">Continue</button>
+                    <button type="button" class="btn btn-sm btn-flat btn-secondary rounded-0"
+                        data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
     <script>
-        window.start_loader = function() {
+
+
+        var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
+        (function () {
+            var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
+            s1.async = true;
+            s1.src = 'https://embed.tawk.to/641e9f2d4247f20fefe7e0f5/1gsbprjhb';
+            s1.charset = 'UTF-8';
+            s1.setAttribute('crossorigin', '*');
+            s0.parentNode.insertBefore(s1, s0);
+        })();
+
+       
+
+
+        window.start_loader = function () {
             $('body').removeClass('loaded')
         }
-        window.end_loader = function() {
+        window.end_loader = function () {
             $('body').addClass('loaded')
         }
-        window.uni_modal = function($title = '', $url = '', $size = "") {
+        window.uni_modal = function ($title = '', $url = '', $size = "") {
             start_loader()
             $.ajax({
                 url: $url,
@@ -140,12 +163,12 @@
                     console.log()
                     alert("An error occured")
                 },
-                success: function(resp) {
+                success: function (resp) {
                     if (resp) {
                         $('#uni_modal .modal-title').html($title)
                         $('#uni_modal .modal-body').html(resp)
                         if ($size != '') {
-                            $('#uni_modal .modal-dialog').addClass($size + '  modal-dialog-centered')
+                            $('#uni_modal .modal-dialog').addClass($size + ' modal-dialog-centered')
                         } else {
                             $('#uni_modal .modal-dialog').removeAttr("class").addClass("modal-dialog modal-md modal-dialog-centered")
                         }
@@ -160,12 +183,12 @@
                 }
             })
         }
-        window._conf = function($msg = '', $func = '', $params = []) {
+        window._conf = function ($msg = '', $func = '', $params = []) {
             $('#confirm_modal #confirm').attr('onclick', $func + "(" + $params.join(',') + ")")
             $('#confirm_modal .modal-body').html($msg)
             $('#confirm_modal').modal('show')
         }
-        $(function() {
+        $(function () {
 
         })
     </script>

@@ -22,32 +22,39 @@
                 {% endif %}
                 {% endfor %}
             </select>
-            <div class="form-group mb-3">
-                <label for="name" class="control-label">Product Name</label>
-                <input type="text" name="name" id="name" class="form-control form-control-sm rounded-0"
-                    value="{% if product.name %}{{product.name}}{% endif %}" required>
-            </div>
-            <div class="form-group mb-3">
-                <label for="price" class="control-label">Price</label>
-                <input type="text" name="price" id="price" class="form-control form-control-sm rounded-0"
-                    value="{% if product.price %}{{product.price}}{% endif %}" required>
-            </div>
-            <div class="form-group mb-3">
-                <label for="status" class="control-label">Status</label>
-                <select name="status" id="status" class="form-select form-select-sm rounded-0" required>
-                    {% if product.status and product.status == 1 %}
-                    <option value="1" selected>Active</option>
-                    {% else %}
-                    <option value="1">Active</option>
-                    {% endif %}
+        </div>
+        <div class="form-group mb-3">
+            <label for="name" class="control-label">Product Name</label>
+            <input type="text" name="name" id="name" class="form-control form-control-sm rounded-0"
+                value="{% if product.name %}{{product.name}}{% endif %}" required>
+        </div>
+        <div class="form-group mb-3">
+            <label for="price" class="control-label">Price</label>
+            <input type="text" name="price" id="price" class="form-control form-control-sm rounded-0"
+                value="{% if product.price %}{{product.price}}{% endif %}" required>
+        </div>
+        <div class="form-group mb-3">
+            <label for="stock" class="control-label">Stock</label>
+            <input type="text" name="stock" id="stock" class="form-control form-control-sm rounded-0"
+                value="{% if product.stock %}{{product.stock}}{% endif %}" required>
+        </div>
+        <div class="form-group mb-3">
+            <label for="status" class="control-label">Status</label>
+            <select name="status" id="status" class="form-select form-select-sm rounded-0" required>
+                {% if product.status and product.status == 1 %}
+                <option value="1" selected>Active</option>
+                {% else %}
+                <option value="1">Active</option>
+                {% endif %}
 
-                    {% if product.status and product.status == 0 %}
-                    <option value="0" selected>Inactive</option>
-                    {% else %}
-                    <option value="0">Inactive</option>
-                    {% endif %}
-                </select>
-            </div>
+                {% if product.status and product.status == 0 %}
+                <option value="0" selected>Inactive</option>
+                {% else %}
+                <option value="0">Inactive</option>
+                {% endif %}
+            </select>
+        </div>
+
     </form>
 </div>
 <script>

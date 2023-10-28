@@ -3,6 +3,8 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import path
 from django.views.generic.base import RedirectView
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('redirect-admin', RedirectView.as_view(url="/admin"),name="redirect-admin"),
@@ -24,12 +26,14 @@ urlpatterns = [
     path('checkout-modal', views.checkout_modal, name="checkout-modal"),
     path('save-pos', views.save_pos, name="save-pos"),
     path('sales', views.salesList, name="sales-page"),
-    path('report', views.report, name="report-page"),
     path('receipt', views.receipt, name="receipt-modal"),
     path('delete_sale', views.delete_sale, name="delete-sale"),
+    path('barcode-generator', views.barcodeGenerator, name="barcode-generator"),
+    path('delete_barcode/<str:barcodeNo>', views.delete_barcode, name="delete-barcode"),
     # path('employees', views.employees, name="employee-page"),
     # path('manage_employees', views.manage_employees, name="manage_employees-page"),
     # path('save_employee', views.save_employee, name="save-employee-page"),
     # path('delete_employee', views.delete_employee, name="delete-employee"),
     # path('view_employee', views.view_employee, name="view-employee-page"),
-]
+    
+]+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

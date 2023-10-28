@@ -2,7 +2,7 @@ from pickle import FALSE
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from flask import jsonify
-from posApp.models import Category, Products, Sales, salesItems
+from posApp.models import Category, Products, Sales, salesItems, Barcode
 from django.db.models import Count, Sum
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -12,9 +12,11 @@ import json
 import sys
 from datetime import date, datetime, timedelta
 import pandas as pd
+import razorpay
+from django.conf import settings
+import random
 
 # Login
-
 
 def login_user(request):
     logout(request)
@@ -65,12 +67,50 @@ def home(request):
         date_added__day=current_day
     ).all()
     total_sales = sum(today_sales.values_list('grand_total', flat=True))
+
+    alert = Products.objects.filter(stock__lt=30)
+
+
+    end_date = datetime.now().date()
+    start_date = end_date - timedelta(days=29)
+    sales_data = Sales.objects.filter(
+        date_added__date__range=(start_date, end_date))
+
+    dates = []
+    sales = []
+    current_date = start_date
+    while current_date <= end_date:
+        sales_total = sales_data.filter(date_added__date=current_date).aggregate(
+            total=Sum('grand_total'))['total']
+        dates.append(current_date.strftime('%Y-%m-%d'))
+        sales.append(sales_total or 0)
+        current_date += timedelta(days=1)
+
+    productname = []
+    inventory = []
+    x,y = 0,0
+    productdata = Products.objects.all()
+    for i in productdata:
+        productname.append(i.name)
+        n = { "x": x, "y": i.stock}
+        inventory.append(n)
+        x+=1
+
+    # report - Transactions
+    print(inventory)
+    # print(sales)
+
     context = {
         'page_title': 'Home',
         'categories': categories,
         'products': products,
         'transaction': transaction,
         'total_sales': total_sales,
+        'alert': alert,
+        'dates': dates,
+        'sales' : sales,
+        'productname': productname,
+        'inventory' : inventory
     }
     return render(request, 'posApp/home.html', context)
 
@@ -118,10 +158,10 @@ def save_category(request):
     try:
         if (data['id']).isnumeric() and int(data['id']) > 0:
             save_category = Category.objects.filter(id=data['id']).update(
-                name=data['name'], description=data['description'], status=data['status'])
+                name=data['name'], status=data['status'])
         else:
             save_category = Category(
-                name=data['name'], description=data['description'], status=data['status'])
+                name=data['name'], status=data['status'])
             save_category.save()
         resp['status'] = 'success'
         messages.success(request, 'Category Successfully saved.')
@@ -141,6 +181,7 @@ def delete_category(request):
     except:
         resp['status'] = 'failed'
     return HttpResponse(json.dumps(resp), content_type="application/json")
+
 
 # Products
 
@@ -165,20 +206,20 @@ def products(request):
             try:
                 product = Products.objects.get(name=row['name'])
             except Products.DoesNotExist:
-                product= None
+                product = None
             if product:
-                    product.stock += row['stock']
-                    product.save()
+                product.stock += row['stock']
+                product.save()
             else:
-                Products.objects.create(code= row['code'],
-                    category_id= category,
-                    name= row['name'],
-                    price= row['price'],
-                    stock= row['stock'])
+                Products.objects.create(code=row['code'],
+                                        category_id=category,
+                                        name=row['name'],
+                                        price=row['price'],
+                                        stock=row['stock'])
     product_list = Products.objects.all()
     for products in product_list:
         if products.stock > 0:
-            products.status=1
+            products.status = 1
             products.save()
     context = {
         'page_title': 'Product List',
@@ -232,10 +273,10 @@ def save_product(request):
         try:
             if (data['id']).isnumeric() and int(data['id']) > 0:
                 save_product = Products.objects.filter(id=data['id']).update(
-                    code=data['code'], category_id=category, name=data['name'], description=data['description'], price=float(data['price']), status=data['status'])
+                    code=data['code'], category_id=category, name=data['name'], price=float(data['price']), status=data['status'], stock=data['stock'])
             else:
                 save_product = Products(code=data['code'], category_id=category, name=data['name'],
-                                        description=data['description'], price=float(data['price']), status=data['status'])
+                                        price=float(data['price']), status=data['status'], stock=data['stock'])
                 save_product.save()
             resp['status'] = 'success'
             messages.success(request, 'Product Successfully saved.')
@@ -263,7 +304,7 @@ def save_product(request):
 #                 'category': category
 #             }
 #             Products.objects.create(**product_data)
-    
+
 #     return render(request, 'posApp/products.html')
 
 
@@ -287,7 +328,7 @@ def pos(request):
     for product in products:
         if product.stock != 0:
             product_json.append(
-                {'id': product.id, 'name': product.name, 'price': float(product.price), 'barcode':product.code})
+                {'id': product.id, 'name': product.name, 'price': float(product.price), 'barcode': product.code})
     context = {
         'page_title': "Point of Sale",
         'products': products,
@@ -306,7 +347,14 @@ def pos(request):
     #     'product_json': json.dumps(product_json)
     # }
     # print(json.dumps(product_json))
-    # return HttpResponse('')
+    # return HttpResponse('')total = int(grand_total) * 100
+
+    # client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+    # # payment = client.order.create(amount= int(total), currency='INR')
+    # data = { "amount": total, "currency": "INR", "receipt": "order_rcptid_11" }
+    # payment = client.order.create(data=data)
+    # print(payment)
+
     return render(request, 'posApp/pos.html', context)
 
 
@@ -315,9 +363,11 @@ def checkout_modal(request):
     grand_total = 0
     if 'grand_total' in request.GET:
         grand_total = request.GET['grand_total']
+    
     context = {
         'grand_total': grand_total,
     }
+
     return render(request, 'posApp/checkout.html', context)
 
 
@@ -427,27 +477,61 @@ def delete_sale(request):
     return HttpResponse(json.dumps(resp), content_type='application/json')
 
 
+# @login_required
+# def report(request):
+#     # report - sales
+#     end_date = datetime.now().date()
+#     start_date = end_date - timedelta(days=6)
+#     sales_data = Sales.objects.filter(
+#         date_added__date__range=(start_date, end_date))
+
+#     dates = []
+#     sales = []
+#     current_date = start_date
+#     while current_date <= end_date:
+#         sales_total = sales_data.filter(date_added__date=current_date).aggregate(
+#             total=Sum('grand_total'))['total']
+#         dates.append(current_date.strftime('%Y-%m-%d'))
+#         sales.append(sales_total or 0)
+#         current_date += timedelta(days=1)
+
+    
+#     # report - Transactions
+#     print(dates)
+#     print(sales)
+#     context = {
+#         'dates': dates,
+#         'sales': sales
+#     }
+#     return render(request, 'posApp/report.html', context)
+
 @login_required
-def report(request):
-    # report - sales
-    end_date = datetime.now().date() 
-    start_date = end_date - timedelta(days=6)
-    sales_data = Sales.objects.filter(date_added__date__range=(start_date, end_date))
+def barcodeGenerator(request):
+    if request.method == "POST":
+        productname = request.POST.get('productname')
+        categoryname = request.POST.get('category_id')
+        price = request.POST.get('price')
+        stock = request.POST.get('stock')
+        status = request.POST.get('status')
+        
+        barcodeNumber = ""
+        if Barcode.objects.filter(name=productname):
+            messages.error(request, "Product already exist.")
+        else:    
+            barcodeNumber = "%0.12d" % random.randint(0,999999999999)
+            Barcode.objects.create(name=productname, barcodeNo=barcodeNumber)
 
-    dates = []
-    sales = []
-    current_date = start_date
-    while current_date <= end_date:
-        sales_total = sales_data.filter(date_added__date=current_date).aggregate(total=Sum('grand_total'))['total']
-        dates.append(current_date.strftime('%Y-%m-%d'))
-        sales.append(sales_total or 0)  
-        current_date += timedelta(days=1) 
+        category_id = Category.objects.get(id=categoryname)
+        Products.objects.create(code=barcodeNumber, name=productname, category_id=category_id, price=price, status=status, stock=stock).save()
+        return redirect('barcode-generator')
+    barcodes = Barcode.objects.all()
+    product = Products.objects.all()
+    categories = Category.objects.all()
+    context = {"barcodes":barcodes, 'product':product, "categories":categories}
+    return render(request, 'posApp/barcode_generator.html', context)
 
-    # report - Transactions
-    print(dates)
-    print(sales)
-    context = {
-        'dates': dates,
-        'sales':sales
-    }
-    return render(request,'posApp/report.html',context)
+@login_required
+def delete_barcode(request, barcodeNo):
+    Barcode.objects.get(barcodeNo=barcodeNo).delete()
+    messages.success(request, 'Product Successfully deleted.')
+    return redirect('barcode-generator')

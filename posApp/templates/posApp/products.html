@@ -6,10 +6,10 @@
             <div class="text-start d-flex items-center justify-content-center">
                 <form action="" method="post" enctype="multipart/form-data" class="d-flex mx-2">
                     {% csrf_token %}
-                    <input type="file" class="form-control form-control-sm rounded-0 my-2" name="excel_file" accept=".xlsx, .xls">
-                    <button type="submit" class="btn btn-primary bg-gradient btn-sm rounded-0 my-2">Upload</button>
+                    <input type="file" class="form-control form-control-sm rounded-0 my-2" name="excel_file" accept=".xlsx, .xls" required>
+                    <button type="submit" class="btn btn-primary bg-gradient btn-sm rounded-0 my-2">Add</button>
                 </form>
-                <!-- <button class="btn btn-primary bg-gradient btn-sm rounded-0" id="create_new"><i class="mdi mdi-plus"></i><span> Add Manually</span></button> -->
+                <button class="btn btn-primary bg-gradient btn-sm rounded-0 my-2" id="create_new"><i class="mdi mdi-plus"></i><span>Single Add</span></button>
             </div>
         </div>
     </div>
@@ -66,12 +66,12 @@
 {% endblock pageContent %} {% block ScriptBlock %}
 <script>
     $(function() {
-        // $('#create_new').click(function() {
-        //     uni_modal("Add New Product", "{% url 'manage_products-page' %}")
-        // })
-        // $('.edit-data').click(function() {
-        //     uni_modal("Edit Product", "{% url 'manage_products-page' %}?id=" + $(this).attr('data-id'))
-        // })
+        $('#create_new').click(function() {
+            uni_modal("Add New Product", "{% url 'manage_products-page' %}")
+        })
+        $('.edit-data').click(function() {
+            uni_modal("Edit Product", "{% url 'manage_products-page' %}?id=" + $(this).attr('data-id'))
+        })
         $('.delete-data').click(function() {
             _conf("Are you sure to delete this Product?", "delete_product", [$(this).attr('data-id')])
         })

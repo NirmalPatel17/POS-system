@@ -3,7 +3,7 @@
 <aside class="mdc-drawer mdc-drawer--dismissible mdc-drawer--open bg-dark bg-gradient">
     <div class="mdc-drawer__header border-bottom border-light">
         <a href="{% url 'home-page' %}" class="brand-logo">
-            <h3 class="text-center text-light">Grocery POS</h3>
+            <h3 class="text-center text-light">POS Software</h3>
         </a>
     </div>
     <div class="mdc-drawer__content">
@@ -34,9 +34,10 @@
                         <i class="material-icons mdc-list-item__start-detail mdc-drawer-item-icon" aria-hidden="true">receipt</i> Sales
                     </a>
                 </div>
+                
                 <div class="mdc-list-item mdc-drawer-item">
-                    <a class="mdc-drawer-link" href="{% url 'report-page' %}">
-                        <i class="material-icons mdc-list-item__start-detail mdc-drawer-item-icon" aria-hidden="true">show_chart</i>Report
+                    <a class="mdc-drawer-link" href="{% url 'barcode-generator' %}">
+                        <i class="material-icons mdc-list-item__start-detail mdc-drawer-item-icon" aria-hidden="true">receipt</i>Barcode generator
                     </a>
                 </div>
             </nav>

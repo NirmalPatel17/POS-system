@@ -1,4 +1,24 @@
 {% extends "posApp/base.html" %} {% load humanize %} {% block pageContent %}
+
+<style>
+    .glowing-text {
+        color: red;
+        font-weight: bold;
+        text-align: center;
+        animation: glow 1s infinite alternate;
+    }
+
+    @keyframes glow {
+        0% {
+            text-shadow: 0 0 5px red, 0 0 10px red, 0 0 15px red;
+        }
+
+        100% {
+            text-shadow: 0 0 10px red, 0 0 20px red, 0 0 30px red;
+        }
+    }
+</style>
+
 <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
     <div class="mdc-card">
         <div class="d-flex justify-content-between">
@@ -9,7 +29,8 @@
 <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
     <hr class="w-100">
 </div>
-<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-3-desktop mdc-layout-grid__cell--span-3-tablet">
+<div
+    class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-3-desktop mdc-layout-grid__cell--span-3-tablet">
     <div class="mdc-card info-card info-card--success">
         <div class="card-inner">
             <h5 class="card-title">Categories</h5>
@@ -21,7 +42,8 @@
         </div>
     </div>
 </div>
-<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-3-desktop mdc-layout-grid__cell--span-3-tablet">
+<div
+    class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-3-desktop mdc-layout-grid__cell--span-3-tablet">
     <div class="mdc-card info-card info-card--primary">
         <div class="card-inner">
             <h5 class="card-title">Products</h5>
@@ -33,7 +55,8 @@
         </div>
     </div>
 </div>
-<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-3-desktop mdc-layout-grid__cell--span-3-tablet">
+<div
+    class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-3-desktop mdc-layout-grid__cell--span-3-tablet">
     <div class="mdc-card info-card info-card--info">
         <div class="card-inner">
             <h5 class="card-title">Today's Transactions</h5>
@@ -45,7 +68,8 @@
         </div>
     </div>
 </div>
-<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-3-desktop mdc-layout-grid__cell--span-3-tablet">
+<div
+    class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-3-desktop mdc-layout-grid__cell--span-3-tablet">
     <div class="mdc-card info-card info-card--warning">
         <div class="card-inner">
             <h5 class="card-title">Today's Sales</h5>
@@ -57,4 +81,115 @@
         </div>
     </div>
 </div>
+
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+    <div class="mdc-card">
+        <div class="d-flex justify-content-between">
+            <h4 class="card-title mb-0">Alerts</h4>
+        </div>
+
+        <table class="table table-striped my-2">
+            <colgroup>
+                <col width="100%">
+            </colgroup>
+            <tbody>
+                {% for i in alert %}
+                <tr>
+                    <td class="px-2 py-1 text-start"><span class="glowing-text">Alert!</span> Stock of {{i.name}} is
+                        {{i.stock}}.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+    <div class="mdc-card info-card info-card--success">
+        <h4>Sales data</h4>
+        <div class="d-flex">
+            <div class="col-6" style="width: 1080px; height: 400px;">
+                <canvas id="myBarChart" class="chart"></canvas>
+            </div>
+        </div>
+        <br>
+        <br>
+      
+        <br>
+        <h4>Inventory data</h4>
+        <br>
+        <div class="d-flex">
+            <div class="col-6" style="width:1100px; height: 400px;">
+                <canvas id="myScatterChart" class="chart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Bar chart
+    var data = {
+        labels: {{ dates| safe}},
+    datasets: [{
+        label: "30 day Sales",
+        data: {{ sales| safe}},
+        backgroundColor: "#0D6EFD",
+        borderColor: "#0D6EFD",
+        borderWidth: 1
+        }]
+    };
+
+    // Options for the bar chart
+    var options = {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        },
+        responsive: true,
+        maintainAspectRatio: false
+    };
+
+    // Get the canvas element
+    var ctx = document.getElementById('myBarChart').getContext('2d');
+
+    // Create the bar chart
+    var myBarChart = new Chart(ctx, {
+        type: 'bar',
+        data: data,
+        options: options
+    });
+
+    // Scatter Chart
+    var data = {
+        labels: {{ productname| safe}},
+    datasets: [{
+        label: 'Stock',
+        data: {{ inventory| safe}},
+        pointBackgroundColor: '#FFA0B4',// Colors for data points
+        pointRadius: 10,
+        pointHoverRadius: 15, // Radius of data points
+        pointStyle: 'circle', // Point styles
+        borderWidth: 2,
+        borderColor: "red"
+        }]
+    };
+
+    // Options for the scatter chart
+    var options = {
+        responsive: true,
+        maintainAspectRatio: false
+    };
+
+    // Get the canvas element
+    var ctx = document.getElementById('myScatterChart').getContext('2d');
+
+    // Create the scatter chart
+    var myScatterChart = new Chart(ctx, {
+        type: 'line',
+        data: data,
+        options: options
+    });
+
+</script>
 {% endblock pageContent %}

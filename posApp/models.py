@@ -1,7 +1,11 @@
 from datetime import datetime
+from io import BytesIO
 from unicodedata import category
 from django.db import models
 from django.utils import timezone
+from django.core.files import File
+import barcode
+from barcode.writer import ImageWriter
 
 # Create your models here.
 
@@ -69,3 +73,19 @@ class salesItems(models.Model):
     price = models.FloatField(default=0)
     qty = models.FloatField(default=0)
     total = models.FloatField(default=0)
+
+class Barcode(models.Model):
+    name = models.CharField(max_length=200)
+    barcode = models.ImageField(upload_to='barcodes/', blank=True)
+    barcodeNo = models.CharField(max_length=12, null=True)
+
+    def __str__(self):
+        return str(self.name)
+
+    def save(self, *args, **kwargs):
+        EAN = barcode.get_barcode_class('ean13')
+        ean = EAN(f'{self.barcodeNo}', writer=ImageWriter())
+        buffer = BytesIO()
+        ean.write(buffer)
+        self.barcode.save(f'{self.name}.png', File(buffer), save=False)
+        return super().save(*args, **kwargs)
