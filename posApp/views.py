@@ -515,14 +515,18 @@ def barcodeGenerator(request):
         status = request.POST.get('status')
         
         barcodeNumber = ""
+        # check_digit = ""
         if Barcode.objects.filter(name=productname):
             messages.error(request, "Product already exist.")
         else:    
             barcodeNumber = "%0.12d" % random.randint(0,999999999999)
             Barcode.objects.create(name=productname, barcodeNo=barcodeNumber)
-
+            odd_sum = sum(int(barcodeNumber[i]) for i in range(0, 12, 2))
+            even_sum = sum(int(barcodeNumber[i]) for i in range(1, 12, 2))
+            total = odd_sum + even_sum * 3
+            check_digit = (10 - (total % 10)) % 10
         category_id = Category.objects.get(id=categoryname)
-        Products.objects.create(code=barcodeNumber, name=productname, category_id=category_id, price=price, status=status, stock=stock).save()
+        Products.objects.create(code=str(barcodeNumber)+str(check_digit), name=productname, category_id=category_id, price=price, status=status, stock=stock).save()
         return redirect('barcode-generator')
     barcodes = Barcode.objects.all()
     product = Products.objects.all()

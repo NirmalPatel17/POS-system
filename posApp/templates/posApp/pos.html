@@ -192,8 +192,8 @@
         var tax_amount = parseFloat(sub_total) * parseFloat(tax);
         $('#tax_amount').text(parseFloat(tax_amount).toLocaleString('en-US'))
         $('[name="tax_amount"]').val(parseFloat(tax_amount))
-        $('#grand_total').text(parseFloat(sub_total).toLocaleString('en-US'))
-        $('[name="grand_total"]').val(parseFloat(sub_total))
+        $('#grand_total').text(parseFloat(sub_total)+parseFloat(tax_amount)).toLocaleString('en-US')
+        $('[name="grand_total"]').val(parseFloat(sub_total)+parseFloat(tax_amount))
         $('#sub_total').text(parseFloat(sub_total).toLocaleString('en-US'))
         $('[name="sub_total"]').val(parseFloat(sub_total))
 
